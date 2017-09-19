@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.javainuse</groupId>
+	<groupId>com.spotify</groupId>
 	<artifactId>SpringBootHelloWorld</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -61,33 +61,35 @@
 	</dependencies>
 
 	<build>
+	
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>0.2.3</version>
-            <configuration>
-            	<dockerHost>https://192.168.90.144:2376</dockerHost>
-                <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                <dockerDirectory>src/main</dockerDirectory>
-                <resources>
-                    <resource>
-                        <targetPath>/src/main</targetPath>
-                        <directory>${project.build.directory}</directory>
-                        <include>${project.build.finalName}.jar</include>
-                    </resource>
-                </resources>
-            </configuration>
-        </plugin>
+					<groupId>com.spotify</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.4.13</version>
+					<configuration>
+						<useConfigFile>true</useConfigFile>
+						<imageName>private.repo.com/namespace/${project.artifactId}</imageName>
+						<baseImage>openjdk:8-jre</baseImage>
+						<entryPoint>java $ARGS -jar /usr/bin/${project.build.finalName}.jar >> /var/log/${project.artifactId}.log</entryPoint>
+						<forceTags>true</forceTags>
+						<imageTags>
+							<imageTag>${project.version}</imageTag>
+							<imageTag>latest</imageTag>
+						</imageTags>
+						<resources>
+							<resource>
+								<targetPath>/usr/bin/</targetPath>
+								<directory>${project.build.directory}</directory>
+								<include>${project.build.finalName}.jar</include>
+							</resource>
+						</resources>
+					</configuration>
+				</plugin>
 		</plugins>
-		
 	</build>
-	
-
-
-
 </project>
